@@ -1,6 +1,7 @@
 欢迎来到Lean的Openwrt源码仓库！
 =
 Welcome to Lean's  git source of OpenWrt and packages
+forked from coolsnowwolf/openwrt
 =
 中文：如何编译自己需要的 OpenWrt 固件
 -
@@ -12,7 +13,7 @@ Welcome to Lean's  git source of OpenWrt and packages
 
 编译命令如下:
 -
-1. 首先装好 Ubuntu 64bit，推荐  Ubuntu  18 LTS x64
+1. 首先装好 Ubuntu 64bit，推荐 Ubuntu 18 LTS x64 或者 Ubuntu 20 LTS x64 ，此两个系统测试编译通过
 
 2. 命令行输入 `sudo apt-get update` ，然后输入
 `
@@ -43,18 +44,33 @@ cd openwrt
 git pull
 ./scripts/feeds update -a && ./scripts/feeds install -a
 make defconfig
-make -j8 download
-make -j$(($(nproc) + 1)) V=s
+make -j4 download
+make -j4 V=s
+#make -j$(($(nproc) + 1)) V=s #这里j后面参数建议为实际CPU线程数1~2倍。
 ```
 
 如果需要重新配置：
 ```bash
 rm -rf ./tmp && rm -rf .config
 make menuconfig
-make -j$(($(nproc) + 1)) V=s
+make -j4 V=s
+#make -j$(($(nproc) + 1)) V=s 
 ```
 
 编译完成后输出路径：/openwrt/bin/targets
+
+错误修正记录（2022-9-8 Written By LYH&LLC）：
+修复[Package * is missing dependencies for the following libraries: libcap.so.2 问题](https://github.com/coolsnowwolf/lede/issues/9670)
+其中目前已知需要用到的包有：samba4-libs、ip-full、tc，如有其他请自己修改源码补充。
+此次编译错误，主要是因为系统libcap更新以后，出现兼容性问题，其实源码中已经自带一个，需要修改相应的Makefile使用自己编译的。
+修改方法如下：
+```bash
+vi package/network/utils/iproute2/Makefile
+/Package/ip-full
+# Package/ip-full和Package/tc(52行和56行)添加上+libcap ，按ESC，ZZ保存退出。
+make menuconfig —> libraries：选中 libcap （一般会默认选中，但需要重新保存下.config文件）
+make -j4 V=s
+```
 
 特别提示：
 ------
