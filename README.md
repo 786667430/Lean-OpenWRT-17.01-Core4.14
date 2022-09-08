@@ -61,8 +61,9 @@ make -j4 V=s
 
 错误修正记录（2022-9-8 Written By LYH&LLC）：
 修复[Package * is missing dependencies for the following libraries: libcap.so.2 问题](https://github.com/coolsnowwolf/lede/issues/9670)
+
 其中目前已知需要用到的包有：samba4-libs、ip-full、tc，如有其他请自己修改源码补充。
-此次编译错误，主要是因为系统libcap更新以后，出现兼容性问题，其实源码中已经自带一个，需要修改相应的Makefile使用自己编译的。
+此次编译错误，主要是因为系统libcap更新以后，出现兼容性问题，其实源码中已经自带一个，需要修改相应的Makefile，[参考链接](https://github.com/coolsnowwolf/openwrt/commit/867914c8abe2ff6eca796a8b804fa8cf48aaa50c)。
 修改方法如下：
 ```bash
 vi package/network/utils/iproute2/Makefile
